@@ -15,21 +15,22 @@ library(scales)
 set.seed(1) 
 
 # define constants
-NumTrain = 30000
-NumTest = 10000
+NumTrain = 31000
+NumTest = 11000
 NumTrees = 25
 
 # load data
 trainRaw <- read_csv("./train.csv")
 
-numRows <- nrow(trainRaw)
+totalRows <- nrow(trainRaw)
 
 #rows <- sample(1:nrow(train), numTrain)
-rows <- numRows:(numRows-NumTrain)
+rows <- totalRows:(totalRows-NumTrain)
 labels <- as.factor(trainRaw[rows,1])
 trainWithoutLabels <- trainRaw[rows,-1]
 
 test <- head(trainRaw[-1], NumTest)
+testLabels <- as.factor(trainRaw[1:NumTest, 1])
 
 # precision function to verify the results
 precision <- function(correct, predicted) {
@@ -47,9 +48,13 @@ precision <- function(correct, predicted) {
 
 # actual Random Forest classifying
 
-rf <- randomForest(x=trainWithoutLabels, y=as.factor(labels), xtest=test, ntree=NumTrees)
+rf <- randomForest(x=trainWithoutLabels, y=as.factor(labels), xtest=test, ytest=testLabels, ntree=NumTrees)
 randomForestPredictions <- data.frame(ImageId=1:nrow(test), Label=levels(labels)[rf$test$predicted])
 
-randomForestPrecision <- precision(train[1], randomForestPredictions[2])
+randomForestPrecision <- precision(trainRaw[1], randomForestPredictions[2])
 
-sprintf("Random Forest precision: %s", randomForestPrecision)
+print("--------------------------------------------------")
+print("Random Forest")
+sprintf("Precision: %s", randomForestPrecision)
+print("Confusion matrix: ")
+print(rf$test$confusion)
