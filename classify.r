@@ -7,16 +7,18 @@ install.packages('randomForest')
 install.packages('readr')
 
 # load libraries
+library(gmodels)
 library(randomForest)
 library(readr)
 library(scales)
+library(class)
 
 # for constant and repeatable results
 set.seed(1) 
 
 # define constants
-NumTrain = 31000
-NumTest = 11000
+NumTrain = 3100
+NumTest = 1100
 NumTrees = 25
 
 # load data
@@ -48,7 +50,7 @@ precision <- function(correct, predicted) {
 
 # actual Random Forest classifying
 
-rf <- randomForest(x=trainWithoutLabels, y=as.factor(labels), xtest=test, ytest=testLabels, ntree=NumTrees)
+rf <- randomForest(x=trainWithoutLabels, y=labels, xtest=test, ytest=testLabels, ntree=NumTrees)
 randomForestPredictions <- data.frame(ImageId=1:nrow(test), Label=levels(labels)[rf$test$predicted])
 
 randomForestPrecision <- precision(trainRaw[1], randomForestPredictions[2])
@@ -58,3 +60,18 @@ print("Random Forest")
 sprintf("Precision: %s", randomForestPrecision)
 print("Confusion matrix: ")
 print(rf$test$confusion)
+
+
+# k Nearest Neighbours classifying
+NeighbourCount = 5
+
+nn <- knn(train = trainWithoutLabels, cl = labels, test = test, k = NeighbourCount)
+nnPredictions <- as.data.frame(nn)
+nnPrecision <- precision(trainRaw[1], nnPredictions)
+
+print("--------------------------------------------------")
+sprintf("%s Nearest Neighbours", NeighbourCount)
+sprintf("Precision: %s", nnPrecision)
+print("Confusion matrix: ")
+confusionMatrix <- CrossTable(testLabels, as.factor(nnPredictions[,1]))$t
+print(confusionMatrix)
