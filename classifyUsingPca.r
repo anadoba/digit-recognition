@@ -22,8 +22,8 @@ library(class)
 set.seed(1) 
 
 # define constants
-NumTrain = 310
-NumTest = 110
+NumTrain = 31000
+NumTest = 11000
 NumTrees = 25
 NumComponents = 20
 
@@ -43,7 +43,7 @@ test <- head(trainRaw[-1], NumTest)
 testLabels <- as.factor(trainRaw[1:NumTest, 1])
 
 # apply PCA
-pca <- prcomp(trainRaw[1:10000,-1])
+pca <- prcomp(trainRaw[,-1])
 
 trainPca <- predict(pca, newdata=trainWithoutLabels)[,1:NumComponents]
 trainWithoutLabels <- as.data.frame(trainPca)
@@ -105,18 +105,18 @@ print(confusionMatrix)
 
 
 # neural net classifying
-HiddenNeuronCount = 15
+#HiddenNeuronCount = 15
+#
+#net <- neuralnet(formula, data = trainWithLabelsMatrix, hidden = HiddenNeuronCount)
+#results <- compute(net, test)$net.result
+#netPrecision <- precision(trainRaw[1], results)
 
-net <- neuralnet(formula, data = trainWithLabelsMatrix, hidden = HiddenNeuronCount)
-results <- compute(net, test)$net.result
-netPrecision <- precision(trainRaw[1], results)
-
-print("--------------------------------------------------")
-sprintf("Neural Net (hidden = %s)", HiddenNeuronCount)
-sprintf("Precision: %s", netPrecision)
-print("Confusion matrix: ")
-confusion <- table(testLabels, results, dnn = c("Actual", "Predicted"))
-print(confusion)
+#print("--------------------------------------------------")
+#sprintf("Neural Net (hidden = %s)", HiddenNeuronCount)
+#sprintf("Precision: %s", netPrecision)
+#print("Confusion matrix: ")
+#confusion <- table(testLabels, results, dnn = c("Actual", "Predicted"))
+#print(confusion)
 
 # ctree classifying
 digitsTree <- ctree(formula, data = trainWithLabels)
