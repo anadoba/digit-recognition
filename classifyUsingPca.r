@@ -5,14 +5,12 @@
 setwd('/users/adam/studia/inteligencjaObl/projekt')
 
 # download packages
-install.packages('neuralnet')
 install.packages('randomForest')
 install.packages('readr')
 install.packages('e1071')
 
 # load libraries
 library(e1071)
-library(neuralnet)
 library(gmodels)
 library(randomForest)
 library(readr)
@@ -104,21 +102,6 @@ sprintf("Precision: %s", nnPrecision)
 confusionMatrix <- table(testLabels, as.factor(nnPredictions[,1]), dnn = c("Actual", "Predicted"))
 print("Confusion matrix: ")
 print(confusionMatrix)
-
-
-# neural net classifying
-#HiddenNeuronCount = 15
-#
-#net <- neuralnet(formula, data = trainWithLabelsMatrix, hidden = HiddenNeuronCount)
-#results <- compute(net, test)$net.result
-#netPrecision <- precision(trainRaw[1], results)
-
-#print("--------------------------------------------------")
-#sprintf("Neural Net (hidden = %s)", HiddenNeuronCount)
-#sprintf("Precision: %s", netPrecision)
-#print("Confusion matrix: ")
-#confusion <- table(testLabels, results, dnn = c("Actual", "Predicted"))
-#print(confusion)
 
 
 # Conditional Inference Trees classifying
