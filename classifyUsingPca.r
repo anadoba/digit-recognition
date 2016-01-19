@@ -1,4 +1,6 @@
 # Adam Nadoba
+# Kaggle - Digit Recognizer
+# several classifying algorithms used with PCA
 
 setwd('/users/adam/studia/inteligencjaObl/projekt')
 
@@ -25,7 +27,7 @@ set.seed(1)
 NumTrain = 31000
 NumTest = 11000
 NumTrees = 25
-NumComponents = 20
+NumComponents = 25
 
 # load data
 trainRaw <- read_csv("./train.csv")
@@ -75,15 +77,15 @@ precision <- function(correct, predicted) {
   return(percent(legitimate/total))
 }
 
+
 # actual Random Forest classifying
+print("--------------------------------------------------")
+print("Random Forest")
 
 rf <- randomForest(x=trainWithoutLabels, y=labels, xtest=test, ytest=testLabels, ntree=NumTrees)
 randomForestPredictions <- data.frame(ImageId=1:nrow(test), Label=levels(labels)[rf$test$predicted])
-
 randomForestPrecision <- precision(trainRaw[1], randomForestPredictions[2])
 
-print("--------------------------------------------------")
-print("Random Forest")
 sprintf("Precision: %s", randomForestPrecision)
 print("Confusion matrix: ")
 print(rf$test$confusion)
@@ -91,16 +93,16 @@ print(rf$test$confusion)
 
 # k Nearest Neighbours classifying
 NeighbourCount = 5
+print("--------------------------------------------------")
+sprintf("%s Nearest Neighbours", NeighbourCount)
 
 nn <- knn(train = trainWithoutLabels, cl = labels, test = test, k = NeighbourCount)
 nnPredictions <- as.data.frame(nn)
 nnPrecision <- precision(trainRaw[1], nnPredictions)
 
-print("--------------------------------------------------")
-sprintf("%s Nearest Neighbours", NeighbourCount)
 sprintf("Precision: %s", nnPrecision)
-print("Confusion matrix: ")
 confusionMatrix <- table(testLabels, as.factor(nnPredictions[,1]), dnn = c("Actual", "Predicted"))
+print("Confusion matrix: ")
 print(confusionMatrix)
 
 
@@ -118,27 +120,45 @@ print(confusionMatrix)
 #confusion <- table(testLabels, results, dnn = c("Actual", "Predicted"))
 #print(confusion)
 
-# ctree classifying
-digitsTree <- ctree(formula, data = trainWithLabels)
-results <- predict(digitsTree, test)
-ctreePrecision <- precision(trainRaw[1], as.data.frame(results))
 
+# Conditional Inference Trees classifying
 print("--------------------------------------------------")
 print("Conditional Inference Trees")
+
+digitsTree <- ctree(formula, data = trainWithLabels)
+ctreePred <- predict(digitsTree, test)
+ctreePrecision <- precision(trainRaw[1], as.data.frame(ctreePred))
+
 sprintf("Precision: %s", ctreePrecision)
+confusion <- table(as.factor(testLabels), ctreePred, dnn = c("Actual", "Predicted"))
 print("Confusion matrix: ")
-confusion <- table(as.factor(testLabels), results, dnn = c("Actual", "Predicted"))
 print(confusion)
 
-# naive bayes classifying
 
-nb <- naiveBayes(x=trainWithoutLabels, y=labels)
-#nb <- naiveBayes(formula, data = trainWithLabels)
+# Naive Bayes classifying
+print("--------------------------------------------------")
+print("Naive Bayes")
+
+nb <- naiveBayes(x = trainWithoutLabels, y = labels)
 nbPred <- predict(nb, test)
 nbPrecision <- precision(trainRaw[1], as.data.frame(nbPred))
 
-print("--------------------------------------------------")
-print("Naive Bayes")
 sprintf("Precision: %s", nbPrecision)
 nbConfusion <- table(testLabels, nbPred, dnn = c("Actual", "Predicted"))
+print("Confusion matrix: ")
 print(nbConfusion)
+
+
+# Support Vector Machines classifying
+print("--------------------------------------------------")
+print("Support Vector Machines")
+
+svmModel <- svm(x = trainWithoutLabels, y = labels)
+svmPred <- predict(svmModel, test)
+svmPrecision <- precision(trainRaw[1], as.data.frame(svmPred))
+svmPrecision
+
+sprintf("Precision: %s", svmPrecision)
+svmConfusion <- table(testLabels, svmPred, dnn = c("Actual", "Predicted"))
+print("Confusion matrix: ")
+print(svmConfusion)
