@@ -19,7 +19,7 @@ library(class)
 set.seed(1) 
 
 # define constant
-NumComponents = 100
+NumComponents = 50
 
 # load data
 trainRaw <- read_csv("./train.csv")
