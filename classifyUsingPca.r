@@ -10,13 +10,12 @@ install.packages('readr')
 install.packages('e1071')
 
 # load libraries
-library(e1071)
-library(gmodels)
+library(e1071) # svm
 library(randomForest)
 library(readr)
-library(scales)
-library(party)
-library(class)
+library(scales) # percent
+library(party) # ctree
+library(class) # knn
 
 # for constant and repeatable results
 set.seed(1) 
